@@ -1,23 +1,25 @@
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
-  const { url } = req.query;
-  if (!url) return res.status(400).json({ error: 'No URL provided' });
+  const { matchId, type } = req.query;
+
   try {
-    const response = await fetch(decodeURIComponent(url), {
+    let url;
+    if (type === 'recent') {
+      url = 'https://cricbuzz-cricket.p.rapidapi.com/matches/v1/recent';
+    } else if (matchId) {
+      url = `https://cricbuzz-cricket.p.rapidapi.com/mcenter/v1/${matchId}/scard`;
+    } else {
+      return res.status(400).json({ error: 'Provide matchId or type=recent' });
+    }
+
+    const response = await fetch(url, {
       headers: {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-        'Accept': 'application/json, text/plain, */*',
-        'Accept-Language': 'en-US,en;q=0.9',
-        'Referer': 'https://www.espncricinfo.com/',
-        'Origin': 'https://www.espncricinfo.com'
+        'x-rapidapi-host': 'cricbuzz-cricket.p.rapidapi.com',
+        'x-rapidapi-key': 'b2b08f7d42msh762a849bc2d5696p1a2010jsn8fa70ff4ca7c'
       }
     });
-    const text = await response.text();
-    try {
-      res.json(JSON.parse(text));
-    } catch {
-      res.status(200).send(text.slice(0, 500));
-    }
+    const data = await response.json();
+    res.json(data);
   } catch(e) {
     res.status(500).json({ error: e.message });
   }
