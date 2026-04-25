@@ -1,6 +1,6 @@
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
-  const { matchId, type, seriesId } = req.query;
+  const { matchId, type } = req.query;
 
   try {
     let url;
@@ -22,9 +22,13 @@ export default async function handler(req, res) {
         'x-rapidapi-key': 'b2b08f7d42msh762a849bc2d5696p1a2010jsn8fa70ff4ca7c'
       }
     });
-    const data = await response.json();
-    res.json(data);
+    const text = await response.text();
+    try {
+      res.json(JSON.parse(text));
+    } catch(e) {
+      res.status(200).json({ error: 'Invalid JSON', raw: text.slice(0,100) });
+    }
   } catch(e) {
-    res.status(500).json({ error: e.message });
+    res.status(200).json({ error: e.message });
   }
 }
