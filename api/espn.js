@@ -6,12 +6,14 @@ export default async function handler(req, res) {
     let url;
     if (type === 'recent') {
       url = 'https://cricbuzz-cricket.p.rapidapi.com/matches/v1/recent';
-    } else if (type === 'series' && seriesId) {
-      url = `https://cricbuzz-cricket.p.rapidapi.com/series/v1/${seriesId}/matches`;
+    } else if (type === 'upcoming') {
+      url = 'https://cricbuzz-cricket.p.rapidapi.com/matches/v1/upcoming';
+    } else if (type === 'live') {
+      url = 'https://cricbuzz-cricket.p.rapidapi.com/matches/v1/live';
     } else if (matchId) {
       url = `https://cricbuzz-cricket.p.rapidapi.com/mcenter/v1/${matchId}/scard`;
     } else {
-      return res.status(400).json({ error: 'Provide matchId, type=recent, or type=series&seriesId=X' });
+      return res.status(400).json({ error: 'Provide matchId or type' });
     }
 
     const response = await fetch(url, {
